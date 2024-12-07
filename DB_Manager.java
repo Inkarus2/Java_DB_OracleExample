@@ -6,17 +6,6 @@ public class DB_Manager {
     private static final String DB_USER = "USER";
     private static final String DB_PASSWORD = "PW";
 
-    // klappt irgendwie nicht :(
-    public static Connection ConnectDB() {
-        try (Connection conn = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            System.out.println("Verbindung erfolgreich!");
-            return conn;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public static void AddEnergyData(int meterId, double consumed, double generated) {
         try (Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             if (con == null) {
@@ -36,7 +25,7 @@ public class DB_Manager {
         }
     }
 
-    public static double GetAverageConsumtion(int meterId) {
+    public static double GetAverageConsumption(int meterId) {
         return GetAverage(meterId, "consumption_kwh");
     }
 
@@ -44,20 +33,24 @@ public class DB_Manager {
         return GetAverage(meterId, "generation_kwh");
     }
 
-    public static double GetAverage(int meterId, String columnName)
-    {
+    public static double GetAverage(int meterId, String columnName) {
         try (Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
             if (con == null) {
                 return 0;
             }
+
             long elapsedTime = GetElapsedTime(meterId, con);
-            String sqlString = "SELECT SUM("+ columnName +") AS total FROM EnergyData WHERE meter_id = ?";
+            if (elapsedTime == 0) {
+                return 0;
+            }
+
+            String sqlString = "SELECT SUM(" + columnName + ") AS total FROM EnergyData WHERE meter_id = ?";
             try (PreparedStatement sqlQuery = con.prepareStatement(sqlString)) {
                 sqlQuery.setInt(1, meterId);
                 ResultSet results = sqlQuery.executeQuery();
                 results.next();
                 double total = results.getDouble("total");
-                return total/elapsedTime;
+                return total / elapsedTime;
 
             } catch (SQLException e) {
                 e.printStackTrace();
@@ -69,15 +62,13 @@ public class DB_Manager {
         return 0;
     }
 
-    public static long GetElapsedTime(int meterId, Connection con)
-    {
+    public static long GetElapsedTime(int meterId, Connection con) {
         String sqlString = "SELECT timestamp FROM EnergyData WHERE meter_id = ?";
         try (PreparedStatement sqlQuery = con.prepareStatement(sqlString)) {
             sqlQuery.setInt(1, meterId);
             ResultSet results = sqlQuery.executeQuery();
             Timestamp startTime = new Timestamp(System.currentTimeMillis());
             Timestamp endTime = Timestamp.valueOf("1970-01-01 00:00:00");
-            double consumtionGen = 0;
             while (results.next()) {
                 Timestamp time = results.getTimestamp("timestamp");
                 if (startTime.after(time)) {
@@ -88,7 +79,7 @@ public class DB_Manager {
                     endTime = time;
                 }
             }
-            return (endTime.getTime() - startTime.getTime())/1000;
+            return (endTime.getTime() - startTime.getTime()) / 1000;
         } catch (SQLException e) {
             e.printStackTrace();
         }

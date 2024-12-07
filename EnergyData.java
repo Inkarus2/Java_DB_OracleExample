@@ -9,13 +9,13 @@ public class EnergyData {
 
     private static void GetUserInput(Scanner scanner) {
         while (true) {
-            System.out.println("\nEnergy option");
+            System.out.println("\n Energy options:");
             System.out.println("1. Add data");
-            System.out.println("2. Average consumption");
-            System.out.println("3. Average generation");
+            System.out.println("2. Get average consumption");
+            System.out.println("3. Get average generation");
             System.out.println("4. Quit");
 
-            System.out.print("Wählen Sie eine Option: ");
+            System.out.print("Choose an option: ");
 
             int option = scanner.nextInt();
             scanner.nextLine();
@@ -26,7 +26,7 @@ public class EnergyData {
                     break;
 
                 case 2:
-                    GetAverageConsumtion(scanner);
+                    GetAverageConsumption(scanner);
                     break;
 
                 case 3:
@@ -54,11 +54,11 @@ public class EnergyData {
         DB_Manager.AddEnergyData(meter_id, consumed, generated);
     }
 
-    public static void GetAverageConsumtion(Scanner scanner)
+    public static void GetAverageConsumption(Scanner scanner)
     {       
         int meter_id = GetMeterId(scanner);
-        double average = DB_Manager.GetAverageConsumtion(meter_id);
-        System.out.printf("Average power consumtion: %.2f kwh %n", average);
+        double average = DB_Manager.GetAverageConsumption(meter_id);
+        System.out.printf("Average power consumption: %.2f kwh %n", average);
     }
 
     public static void GetAverageGeneration(Scanner scanner)
@@ -70,7 +70,7 @@ public class EnergyData {
 
     public static int GetMeterId(Scanner scanner)
     {
-        System.out.println("MeterId:");
+        System.out.println("Meter Id:");
         int meter_id = scanner.nextInt();
         scanner.nextLine();
         return meter_id;
