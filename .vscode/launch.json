@@ -1,0 +1,7 @@
+{
+    "type": "java",
+    "request": "launch",
+    "mainClass": "MainClass",
+    "vmArgs": "-cp lib/ojdbc11.jar"
+    
+}
